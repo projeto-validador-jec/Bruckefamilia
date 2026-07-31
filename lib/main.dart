@@ -1,4 +1,4 @@
-import 'dart:io';
+Ôªøimport 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -11,9 +11,18 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:translator/translator.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
-import 'call_page.dart'; // Import da tela de chamadas!
+import 'call_page.dart';
 import 'firebase_options.dart';
+
+// ========================================================================
+// ‚ö†Ô∏è ATEN√á√ÉO: COLOQUE SUAS CREDENCIAIS DO ZEGOCLOUD AQUI
+// ========================================================================
+const int zegoAppId = 1607164961; // Seu App ID verdadeiro
+const String zegoAppSign =
+    "COLE_AQUI_A_SUA_CHAVE_DO_ZEGO_CLOUD"; // SUBSTITUA PELA SUA CHAVE
+// ========================================================================
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,7 +36,7 @@ class BruckeFamiliaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Br¸ckeFamÌlia',
+      title: 'Br√ºckeFam√≠lia',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
@@ -40,9 +49,6 @@ class BruckeFamiliaApp extends StatelessWidget {
   }
 }
 
-// ==========================================
-// TELA DE SPLASH
-// ==========================================
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
@@ -84,9 +90,6 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 }
 
-// ==========================================
-// TELA DE IDENTIFICA«√O
-// ==========================================
 class IdentificacaoScreen extends StatefulWidget {
   const IdentificacaoScreen({super.key});
 
@@ -127,19 +130,19 @@ class _IdentificacaoScreenState extends State<IdentificacaoScreen> {
               ),
               const SizedBox(height: 24),
               const Text(
-                'Bem-vindo ao Br¸ckeFamÌlia!',
+                'Bem-vindo ao Br√ºckeFam√≠lia!',
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               const Text(
-                'Como vocÍ quer ser chamado(a) aqui?',
+                'Como voc√™ quer ser chamado(a) aqui?',
                 style: TextStyle(color: Colors.white70),
               ),
               const SizedBox(height: 24),
               TextField(
                 controller: _nomeController,
                 decoration: InputDecoration(
-                  hintText: 'Ex: Paulo, M„e, Tio Jo„o...',
+                  hintText: 'Ex: Paulo, M√£e, Tio Jo√£o...',
                   filled: true,
                   fillColor: const Color(0xFF101A26),
                   border: OutlineInputBorder(
@@ -166,6 +169,7 @@ class _IdentificacaoScreenState extends State<IdentificacaoScreen> {
                     style: TextStyle(
                       color: Colors.black87,
                       fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
                     ),
                   ),
                 ),
@@ -178,9 +182,6 @@ class _IdentificacaoScreenState extends State<IdentificacaoScreen> {
   }
 }
 
-// ==========================================
-// TELA DO CHAT
-// ==========================================
 class ChatScreen extends StatefulWidget {
   final String meuNome;
   const ChatScreen({super.key, required this.meuNome});
@@ -198,11 +199,11 @@ class _ChatScreenState extends State<ChatScreen> {
   final DatabaseReference _statusRef = FirebaseDatabase.instance.ref().child(
     'status_digitando',
   );
-  final AudioPlayer _playerNotificacao = AudioPlayer(); 
+  final AudioPlayer _playerNotificacao = AudioPlayer();
 
   String _quemEstaDigitando = '';
   bool _enviandoMidia = false;
-  int _quantidadeMensagensAnterior = 0; 
+  int _quantidadeMensagensAnterior = 0;
 
   @override
   void initState() {
@@ -238,12 +239,12 @@ class _ChatScreenState extends State<ChatScreen> {
   String _getBandeira() {
     switch (_idiomaAtual) {
       case 'de':
-        return '????';
+        return 'üá©üá™';
       case 'en':
-        return '????';
+        return 'üá∫üá∏';
       case 'pt':
       default:
-        return '????';
+        return 'üáßüá∑';
     }
   }
 
@@ -254,7 +255,7 @@ class _ChatScreenState extends State<ChatScreen> {
     String textoSeguro = CriptografiaService.criptografar(texto);
 
     _database.push().set({
-      'texto': textoSeguro, 
+      'texto': textoSeguro,
       'remetenteNome': widget.meuNome,
       'timestamp': ServerValue.timestamp,
     });
@@ -273,7 +274,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       File file = File(image.path);
-      String nomeArquivo = 'IMG_.jpg';
+      String nomeArquivo = 'IMG_${DateTime.now().millisecondsSinceEpoch}.jpg';
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('imagens_chat')
@@ -292,7 +293,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Erro ao enviar imagem: ')));
+        ).showSnackBar(SnackBar(content: Text('Erro ao enviar imagem: $e')));
       }
     } finally {
       if (mounted) setState(() => _enviandoMidia = false);
@@ -304,7 +305,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
     try {
       File file = File(caminhoLocal);
-      String nomeArquivo = 'AUDIO_.m4a';
+      String nomeArquivo = 'AUDIO_${DateTime.now().millisecondsSinceEpoch}.m4a';
       Reference ref = FirebaseStorage.instance
           .ref()
           .child('audios_chat')
@@ -323,7 +324,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Erro ao enviar ·udio: ')));
+        ).showSnackBar(SnackBar(content: Text('Erro ao enviar √°udio: $e')));
       }
     } finally {
       if (mounted) setState(() => _enviandoMidia = false);
@@ -344,7 +345,7 @@ class _ChatScreenState extends State<ChatScreen> {
           style: TextStyle(color: Colors.white),
         ),
         content: const Text(
-          'Essa mensagem ser· excluÌda para toda a famÌlia.',
+          'Essa mensagem ser√° exclu√≠da para toda a fam√≠lia.',
           style: TextStyle(color: Colors.white70),
         ),
         actions: [
@@ -379,7 +380,7 @@ class _ChatScreenState extends State<ChatScreen> {
           await FirebaseStorage.instance.refFromURL(audioUrl).delete();
         }
       } catch (e) {
-        debugPrint('Erro ao apagar arquivo: ');
+        debugPrint('Erro ao apagar arquivo: $e');
       }
     }
   }
@@ -416,7 +417,7 @@ class _ChatScreenState extends State<ChatScreen> {
         title: Column(
           children: [
             const Text(
-              'BR‹CKE FAMÕLIA',
+              'BR√úCKE FAM√çLIA',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 letterSpacing: 3.0,
@@ -445,17 +446,42 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         centerTitle: true,
         actions: [
-          // ?? NOVO BOT√O DE VÕDEO
+          // ==========================================
+          // NOVO BOT√ÉO: CHAMADA DE √ÅUDIO
+          // ==========================================
+          IconButton(
+            icon: const Icon(Icons.phone, color: Color(0xFF00C4FF)),
+            tooltip: 'Sala de √Åudio',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TelaChamadaAudio(
+                    callID: "audio_familia_oficial",
+                    userID:
+                        widget.meuNome.replaceAll(' ', '_') +
+                        DateTime.now().millisecondsSinceEpoch.toString(),
+                    userName: widget.meuNome,
+                  ),
+                ),
+              );
+            },
+          ),
+          // ==========================================
+          // BOT√ÉO EXISTENTE: CHAMADA DE V√çDEO
+          // ==========================================
           IconButton(
             icon: const Icon(Icons.video_call, color: Color(0xFF00C4FF)),
-            tooltip: 'Sala de VÌdeo',
+            tooltip: 'Sala de V√≠deo',
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => CallPage(
-                    callID: "sala_familia_oficial", // ID Fixo para a famÌlia se encontrar
-                    userID: widget.meuNome.replaceAll(' ', '_') + DateTime.now().millisecondsSinceEpoch.toString(), // ID unico por login
+                    callID: "sala_familia_oficial",
+                    userID:
+                        widget.meuNome.replaceAll(' ', '_') +
+                        DateTime.now().millisecondsSinceEpoch.toString(),
                     userName: widget.meuNome,
                   ),
                 ),
@@ -471,21 +497,21 @@ class _ChatScreenState extends State<ChatScreen> {
               const PopupMenuItem(
                 value: 'pt',
                 child: Text(
-                  '???? PortuguÍs',
+                  'üáßüá∑ Portugu√™s',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
               const PopupMenuItem(
                 value: 'de',
                 child: Text(
-                  '???? Alem„o',
+                  'üá©üá™ Alem√£o',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
               const PopupMenuItem(
                 value: 'en',
                 child: Text(
-                  '???? InglÍs',
+                  'üá∫üá∏ Ingl√™s',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -513,10 +539,8 @@ class _ChatScreenState extends State<ChatScreen> {
           child: Column(
             children: [
               const Divider(color: Color(0xFF162436), height: 1),
-
               if (_enviandoMidia)
                 const LinearProgressIndicator(color: Color(0xFF00C4FF)),
-
               Expanded(
                 child: StreamBuilder(
                   stream: _database.orderByChild('timestamp').onValue,
@@ -553,7 +577,6 @@ class _ChatScreenState extends State<ChatScreen> {
                               mensagemComChave['texto'],
                             );
                       }
-
                       listaMensagens.add(mensagemComChave);
                     });
 
@@ -568,7 +591,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               _quantidadeMensagensAnterior) {
                         final ultimaMsg = listaMensagens.last;
                         if (ultimaMsg['remetenteNome'] != widget.meuNome) {
-                          // _playerNotificacao.play(AssetSource('som_notificacao.mp3'));
+                          // Notificacao opcional pode ir aqui
                         }
                       }
                       _quantidadeMensagensAnterior = listaMensagens.length;
@@ -582,11 +605,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       itemBuilder: (context, index) {
                         final msg = listaMensagens[index];
                         bool fuiEu = msg['remetenteNome'] == widget.meuNome;
-
-                        int timestamp = 0;
-                        if (msg['timestamp'] != null) {
-                          timestamp = (msg['timestamp'] as num).toInt();
-                        }
+                        int timestamp = msg['timestamp'] != null
+                            ? (msg['timestamp'] as num).toInt()
+                            : 0;
 
                         return ChatMessage(
                           firebaseKey: msg['firebaseKey'],
@@ -604,7 +625,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   },
                 ),
               ),
-
               if (_quemEstaDigitando.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(
@@ -614,7 +634,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      '$_quemEstaDigitando est· digitando...',
+                      '$_quemEstaDigitando est√° digitando...',
                       style: const TextStyle(
                         color: Color(0xFF00C4FF),
                         fontStyle: FontStyle.italic,
@@ -623,7 +643,6 @@ class _ChatScreenState extends State<ChatScreen> {
                     ),
                   ),
                 ),
-
               ChatInputArea(
                 onEnviar: _enviarMensagem,
                 onDigitando: _atualizarDigitando,
@@ -639,9 +658,31 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 }
 
-// ==========================================
-// COMPONENTES DO CHAT
-// ==========================================
+class TelaFotoAmpliadas extends StatelessWidget {
+  final String imageUrl;
+  const TelaFotoAmpliadas({super.key, required this.imageUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+      ),
+      body: Center(
+        child: InteractiveViewer(
+          panEnabled: true,
+          minScale: 0.5,
+          maxScale: 4.0,
+          child: Image.network(imageUrl),
+        ),
+      ),
+    );
+  }
+}
+
 class ChatMessage extends StatefulWidget {
   final String firebaseKey;
   final String text;
@@ -673,7 +714,6 @@ class ChatMessage extends StatefulWidget {
 class _ChatMessageState extends State<ChatMessage> {
   String _textoAtual = '';
   bool _traduzindo = false;
-
   final AudioPlayer _audioPlayer = AudioPlayer();
   bool _estaReproduzindo = false;
 
@@ -705,7 +745,7 @@ class _ChatMessageState extends State<ChatMessage> {
         await _audioPlayer.play(UrlSource(widget.audioUrl!));
       }
     } catch (e) {
-      debugPrint("Erro no ·udio: $e");
+      debugPrint("Erro no √°udio: $e");
     }
   }
 
@@ -720,7 +760,6 @@ class _ChatMessageState extends State<ChatMessage> {
 
   Future<void> _realizarTraducao() async {
     if (widget.text.trim().isEmpty) return;
-
     setState(() => _traduzindo = true);
     try {
       final translation = await GoogleTranslator().translate(
@@ -746,7 +785,7 @@ class _ChatMessageState extends State<ChatMessage> {
   String _formatarHora(int timestamp) {
     if (timestamp == 0) return '';
     final data = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    return ':';
+    return '${data.hour.toString().padLeft(2, '0')}:${data.minute.toString().padLeft(2, '0')}';
   }
 
   Color _gerarCor(String nome) {
@@ -782,7 +821,6 @@ class _ChatMessageState extends State<ChatMessage> {
               ),
             ),
           ],
-
           GestureDetector(
             onLongPress: () {
               if (widget.isMe) {
@@ -848,7 +886,6 @@ class _ChatMessageState extends State<ChatMessage> {
                         ),
                       ),
                     ),
-
                   if (widget.audioUrl != null && widget.audioUrl!.isNotEmpty)
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -875,7 +912,6 @@ class _ChatMessageState extends State<ChatMessage> {
                         const SizedBox(width: 8),
                       ],
                     ),
-
                   Wrap(
                     alignment: WrapAlignment.end,
                     crossAxisAlignment: WrapCrossAlignment.end,
@@ -939,7 +975,6 @@ class ChatInputArea extends StatefulWidget {
 
 class _ChatInputAreaState extends State<ChatInputArea> {
   final TextEditingController _controller = TextEditingController();
-
   final AudioRecorder _audioRecorder = AudioRecorder();
   bool _gravando = false;
 
@@ -958,7 +993,6 @@ class _ChatInputAreaState extends State<ChatInputArea> {
       if (_gravando) {
         final caminhoLocal = await _audioRecorder.stop();
         setState(() => _gravando = false);
-
         if (caminhoLocal != null) {
           widget.onAudioGravado(caminhoLocal);
         }
@@ -967,7 +1001,6 @@ class _ChatInputAreaState extends State<ChatInputArea> {
           final dir = await getApplicationDocumentsDirectory();
           String caminho =
               '${dir.path}/audio_${DateTime.now().millisecondsSinceEpoch}.m4a';
-
           await _audioRecorder.start(const RecordConfig(), path: caminho);
           setState(() => _gravando = true);
         }
@@ -989,7 +1022,6 @@ class _ChatInputAreaState extends State<ChatInputArea> {
               icon: const Icon(Icons.image, color: Color(0xFF00C4FF), size: 28),
               onPressed: widget.onAnexarFoto,
             ),
-
           IconButton(
             icon: Icon(
               _gravando ? Icons.stop_circle : Icons.mic,
@@ -998,9 +1030,7 @@ class _ChatInputAreaState extends State<ChatInputArea> {
             ),
             onPressed: _alternarGravacao,
           ),
-
           const SizedBox(width: 4),
-
           Expanded(
             child: TextField(
               controller: _controller,
@@ -1009,7 +1039,7 @@ class _ChatInputAreaState extends State<ChatInputArea> {
               enabled: !_gravando,
               decoration: InputDecoration(
                 hintText: _gravando
-                    ? 'Gravando ·udio...'
+                    ? 'Gravando √°udio...'
                     : 'Digite uma mensagem...',
                 hintStyle: TextStyle(
                   color: _gravando ? Colors.redAccent : Colors.white54,
@@ -1052,41 +1082,16 @@ class _ChatInputAreaState extends State<ChatInputArea> {
   }
 }
 
-// ==========================================
-// TELA FOTO AMPLIADA
-// ==========================================
-class TelaFotoAmpliadas extends StatelessWidget {
-  final String imageUrl;
-  const TelaFotoAmpliadas({super.key, required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
-        elevation: 0,
-      ),
-      body: Center(
-        child: InteractiveViewer(
-          panEnabled: true,
-          minScale: 0.5,
-          maxScale: 4.0,
-          child: Image.network(imageUrl),
-        ),
-      ),
-    );
-  }
-}
-
-// ==========================================
-// SERVI«O DE CRIPTOGRAFIA AES-256
-// ==========================================
+// ========================================================================
+// üîê CLASSE DE CRIPTOGRAFIA CORRIGIDA
+// ========================================================================
 class CriptografiaService {
   static final _key = encrypt.Key.fromUtf8('BrUck3F4m1l14Ch4v3S3cr3t4!2026!!');
-  static final _iv = encrypt.IV.fromLength(16);
-  static final _encrypter = encrypt.Encrypter(encrypt.AES(_key));
+  // Usando um IV fixo de 16 bytes para garantir que quem envia e recebe consiga abrir
+  static final _iv = encrypt.IV.fromUtf8('vetor16bytes2026');
+  static final _encrypter = encrypt.Encrypter(
+    encrypt.AES(_key, mode: encrypt.AESMode.cbc),
+  );
 
   static String criptografar(String texto) {
     if (texto.isEmpty) return '';
@@ -1099,7 +1104,40 @@ class CriptografiaService {
     try {
       return _encrypter.decrypt64(textoCriptografado, iv: _iv);
     } catch (e) {
+      // Se falhar a descriptografia, devolve o texto como chegou
       return textoCriptografado;
     }
+  }
+}
+
+// ========================================================================
+// TELA DA CHAMADA DE √ÅUDIO (ZEGOCLOUD)
+// ========================================================================
+class TelaChamadaAudio extends StatelessWidget {
+  final String callID;
+  final String userID;
+  final String userName;
+
+  const TelaChamadaAudio({
+    super.key,
+    required this.callID,
+    required this.userID,
+    required this.userName,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: ZegoUIKitPrebuiltCall(
+        appID: zegoAppId,
+        appSign: zegoAppSign,
+        userID: userID,
+        userName: userName,
+        callID: callID,
+
+        // oneOnOneVoiceCall() for√ßa a ser apenas √ÅUDIO e j√° fecha autom√°tico
+        config: ZegoUIKitPrebuiltCallConfig.oneOnOneVoiceCall(),
+      ),
+    );
   }
 }

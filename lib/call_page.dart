@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:zego_cloud_uikit_prebuilt_call/zego_cloud_uikit_prebuilt_call.dart';
+import 'package:zego_uikit_prebuilt_call/zego_uikit_prebuilt_call.dart';
 
 class CallPage extends StatelessWidget {
   final String callID;
